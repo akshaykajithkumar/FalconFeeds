@@ -1,0 +1,85 @@
+version: '3.8'
+services:
+  feed-collector:
+    build:
+      context: ./feed-collector
+      dockerfile: Dockerfile
+      no_cache: true
+    container_name: feed-collector
+    depends_on:
+      - redis
+      - jaeger
+    networks:
+      - falconfeeds-net
+    ports:
+      - "4000:4000"
+      - "4001:4001"
+  normalizer:
+    build:
+      context: ./normalizer
+      dockerfile: Dockerfile
+      no_cache: true
+    container_name: normalizer
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - REDIS_URL=redis:6379
+    ports:
+      - "5000:5000"
+    networks:
+      - falconfeeds-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - falconfeeds-net
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    networks:
+      - falconfeeds-net
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  jaeger:
+    image: jaegertracing/all-in-one:1.30
+    container_name: jaeger
+    networks:
+      - falconfeeds-net
+    ports:
+      - "5775:5775"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/akshay/prometheus_config:/etc/prometheus  # Mount the directory
+    networks:
+      - falconfeeds-net
+
+networks:
+  falconfeeds-net:
+    driver: bridge
+
+volumes:
+  redis_data:
+  mongo_data:
