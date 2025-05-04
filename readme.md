@@ -1,6 +1,6 @@
 # FalconFeeds - OSINT Indicator Normalization System
 
-FalconFeeds is a modular system designed to collect OSINT (Open Source Intelligence) feeds, normalize them into STIX 2.1 indicator objects, and make them available for analysis or further consumption. It contains two services: **Feed Collector** and **Normalizer**.
+This is a modular system designed to collect public feeds, normalize them into STIX 2.1 indicator objects, and make them available for analysis or further consumption. It contains two services: **Feed Collector** and **Normalizer**.
 
 ---
 
@@ -8,7 +8,7 @@ FalconFeeds is a modular system designed to collect OSINT (Open Source Intellige
 
 ### 1. **Feed Collector** 
 
-- **Goal**: Collects OSINT feeds from publicly available sources, processes them every 5 minutes, and publishes raw data to a Redis stream.
+- **Goal**: Collects pulls raw threat-intel feeds from publicly available sources, processes them every 5 minutes, and publishes raw data to a Redis stream.
 - **Feed Sources Used For Testing**:
   - Malware Bazaar RSS
   - CERT Bund Advisories
@@ -82,7 +82,7 @@ FalconFeeds is a modular system designed to collect OSINT (Open Source Intellige
 
 1. **Clone the repository**:
     ```bash
-    git clone <repo-url>
+    git clone https://github.com/akshaykajithkumar/FalconFeeds.git
     cd falconfeeds
     ```
 
@@ -130,7 +130,15 @@ FalconFeeds is a modular system designed to collect OSINT (Open Source Intellige
      http://localhost:5000/indicators?value=hash&limit=10
      ```
 
+## **Testing**
+- **Unit tests** have been added to verify the functionality of individual components and ensure they behave as expected.
+- End-to-end **integration tests** have been implemented to validate the entire flow of the system, ensuring that all components work seamlessly together.
 
+  ### Setting Up the Test Environment
+  `docker run -d -p 6379:6379 --name test-redis redis`
+
+  `docker run -d -p 27017:27017 --name test-mongo mongo`
+---
 
 ---
 
@@ -140,6 +148,6 @@ FalconFeeds is a modular system designed to collect OSINT (Open Source Intellige
 - **MongoDB**: Used for storing normalized STIX 2.1 data.
 - **Prometheus**: Used for monitoring and collecting metrics from services.
 - **Jaeger**: Used for distributed tracing, enabling detailed performance analysis and request flow tracking.
-- **Go Modules**: Dependency management via `go.mod`.
+
 
 ---
